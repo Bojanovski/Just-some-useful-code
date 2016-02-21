@@ -4,6 +4,8 @@
 // Abstract class to be used as a base for a worker class 
 // that can efficiently perform certain task whenever
 // it's being called.
+// Motivation behind this is that creating new threads is
+// slower than reusing old ones.
 //***************************************************************
 
 #ifndef ASYNCWORKER_H
