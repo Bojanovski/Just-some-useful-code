@@ -2,7 +2,7 @@
 // AsyncWorker.h by Bojan Lovrovic (C) 2016 All Rights Reserved.
 //
 // Abstract class to be used as a base for a worker class 
-// that can quickly and efficiently perform certain task whenever
+// that can efficiently perform certain task whenever
 // it's being called.
 //***************************************************************
 
