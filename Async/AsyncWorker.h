@@ -26,6 +26,9 @@ public:
 
 	// Wait for worker to finish it's assignment.
 	void Join();
+	
+	// Check whether the current assignment is complete.
+	bool IsDone();
 
 protected:
 	void *mData;
