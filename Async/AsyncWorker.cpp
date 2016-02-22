@@ -54,6 +54,12 @@ void AsyncWorker::Join()
 	while (mDoWork) mFinishCheck.wait(locker);
 }
 
+bool AsyncWorker::IsDone()
+{
+	unique_lock<mutex> locker(mLock);
+	return !mDoWork;
+}
+
 void AsyncWorker::WorkingProc()
 {
 	while (true)
