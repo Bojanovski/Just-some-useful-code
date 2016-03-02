@@ -1,6 +1,9 @@
+//***************************************************************
+// Graph.h by Bojan Lovrovic (C) 2016 All Rights Reserved.
+//***************************************************************
 
-#ifndef _DIJKSTRA_H
-#define _DIJKSTRA_H
+#ifndef GRAPH_H
+#define GRAPH_H
 
 #include <cassert>
 #include <vector>
