@@ -63,11 +63,12 @@ private:
 		WeightType w;
 	};
 
+	// STL does not have a decrease key operation so this is my implementation.
+	// The argument 'newValue' needs to be smaller than the current value in heap at 'keyIndex' position.
+	inline void HeapDecreaseKey(std::vector<VertexWeight> &heap, const WeightType &newValue, unsigned int keyIndex) const;
+
 	// y must be smaller than x
-	inline unsigned int GetIndexForCompact(unsigned int x, unsigned int y) const
-	{
-		return (unsigned int)(x - y - 1 + mVertices.size() * y - y * (y + 1) * 0.5f);
-	}
+	inline unsigned int GetIndexForCompact(unsigned int x, unsigned int y) const;
 
 	// Data members
 	std::vector<VertexType> mVertices;
@@ -253,37 +254,7 @@ bool Graph<VertexType, WeightType>::Dijkstra(const unsigned int sI, const unsign
 			if (uW_new < uW)
 			{
 				predecessors[uI] = vI;
-				toBeCh[i].w = uW_new; // 'decrease key' operation
-
-				// update heap after 'decrease key'
-				bool check = true;
-				unsigned int currentNodeI = i;
-				while (check && currentNodeI != 0)
-				{
-					check = false;
-					unsigned parentI = (currentNodeI + 1) / 2 - 1;
-					unsigned int leftChildI = 2 * (parentI + 1) - 1;
-					unsigned int rightChildI = 2 * (parentI + 1) + 1 - 1;
-					unsigned int childToSwapWithI;
-
-					if (leftChildI >= toBeCh.size() && rightChildI >= toBeCh.size())
-						break; // node has no children
-					else if (leftChildI >= toBeCh.size() && rightChildI < toBeCh.size())
-						childToSwapWithI = rightChildI; // has only right child
-					else if (leftChildI < toBeCh.size() && rightChildI >= toBeCh.size())
-						childToSwapWithI = leftChildI; // has only left child
-					else // has both children
-						childToSwapWithI = (toBeCh[leftChildI].w < toBeCh[rightChildI].w) ? leftChildI : rightChildI;
-
-					if (toBeCh[childToSwapWithI].w < toBeCh[parentI].w)
-					{ // swap
-						VertexWeight temp = toBeCh[parentI];
-						toBeCh[parentI] = toBeCh[childToSwapWithI];
-						toBeCh[childToSwapWithI] = temp;
-						currentNodeI = parentI;
-						check = true;
-					}
-				}
+				HeapDecreaseKey(toBeCh, uW_new, i);
 			}
 		}
 	}
@@ -339,37 +310,7 @@ bool Graph<VertexType, WeightType>::Prim(const unsigned int sI, Graph<VertexType
 			if (uW_new < uW)
 			{
 				predecessors[uI] = vI;
-				toBeCh[i].w = uW_new; // 'decrease key' operation
-
-				// update heap after 'decrease key'
-				bool check = true;
-				unsigned int currentNodeI = i;
-				while (check && currentNodeI != 0)
-				{
-					check = false;
-					unsigned parentI = (currentNodeI + 1) / 2 - 1;
-					unsigned int leftChildI = 2 * (parentI + 1) - 1;
-					unsigned int rightChildI = 2 * (parentI + 1) + 1 - 1;
-					unsigned int childToSwapWithI;
-
-					if (leftChildI >= toBeCh.size() && rightChildI >= toBeCh.size())
-						break; // node has no children
-					else if (leftChildI >= toBeCh.size() && rightChildI < toBeCh.size())
-						childToSwapWithI = rightChildI; // has only right child
-					else if (leftChildI < toBeCh.size() && rightChildI >= toBeCh.size())
-						childToSwapWithI = leftChildI; // has only left child
-					else // has both children
-						childToSwapWithI = (toBeCh[leftChildI].w < toBeCh[rightChildI].w) ? leftChildI : rightChildI;
-
-					if (toBeCh[childToSwapWithI].w < toBeCh[parentI].w)
-					{ // swap
-						VertexWeight temp = toBeCh[parentI];
-						toBeCh[parentI] = toBeCh[childToSwapWithI];
-						toBeCh[childToSwapWithI] = temp;
-						currentNodeI = parentI;
-						check = true;
-					}
-				}
+				HeapDecreaseKey(toBeCh, uW_new, i);
 			}
 		}
 	}
@@ -394,6 +335,48 @@ bool Graph<VertexType, WeightType>::Prim(const unsigned int sI, Graph<VertexType
 
 	outGraph->UpdateEdges();
 	return true;
+}
+
+template<class VertexType, class WeightType>
+void Graph<VertexType, WeightType>::HeapDecreaseKey(std::vector<VertexWeight> &heap, const WeightType &newValue, unsigned int keyIndex) const
+{
+	heap[keyIndex].w = newValue; // 'decrease key' operation
+
+	// update heap after 'decrease key'
+	bool check = true;
+	unsigned int currentNodeI = keyIndex;
+	while (check && currentNodeI != 0)
+	{
+		check = false;
+		unsigned parentI = (currentNodeI + 1) / 2 - 1;
+		unsigned int leftChildI = 2 * (parentI + 1) - 1;
+		unsigned int rightChildI = 2 * (parentI + 1) + 1 - 1;
+		unsigned int childToSwapWithI;
+
+		if (leftChildI >= heap.size() && rightChildI >= heap.size())
+			break; // node has no children
+		else if (leftChildI >= heap.size() && rightChildI < heap.size())
+			childToSwapWithI = rightChildI; // has only right child
+		else if (leftChildI < heap.size() && rightChildI >= heap.size())
+			childToSwapWithI = leftChildI; // has only left child
+		else // has both children
+			childToSwapWithI = (heap[leftChildI].w < heap[rightChildI].w) ? leftChildI : rightChildI;
+
+		if (heap[childToSwapWithI].w < heap[parentI].w)
+		{ // swap
+			VertexWeight temp = heap[parentI];
+			heap[parentI] = heap[childToSwapWithI];
+			heap[childToSwapWithI] = temp;
+			currentNodeI = parentI;
+			check = true;
+		}
+	}
+}
+
+template<class VertexType, class WeightType>
+unsigned int Graph<VertexType, WeightType>::GetIndexForCompact(unsigned int x, unsigned int y) const
+{
+	return (unsigned int)(x - y - 1 + mVertices.size() * y - y * (y + 1) * 0.5f);
 }
 
 #endif
