@@ -39,7 +39,6 @@ public:
 	inline VertexType &GetVertexAt(unsigned int index) { return mVertices[index]; }
 	inline unsigned int GetVertexIndex(const VertexType &vert) const;
 	inline unsigned int GetNumberOfVertices() const { return mVertices.size(); }
-
 	inline Edge<WeightType> &GetEdgeAt(unsigned int index) { return mEdges[index]; }
 	inline Edge<WeightType> &GetEdge(unsigned int v1, unsigned int v2);
 	inline WeightType &GetEdgeWeight(unsigned int v1, unsigned int v2);
