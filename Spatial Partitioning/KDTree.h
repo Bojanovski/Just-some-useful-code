@@ -1,7 +1,7 @@
 //***************************************************************
 // KDTree.h by Bojan Lovrovic (C) 2016 All Rights Reserved.
 // 
-// Structure that helps finding the point from the given set of
+// Structure that helps finding a point from the given set of
 // points that is nearest to the input point.
 //***************************************************************
 
