@@ -1,7 +1,7 @@
 //***************************************************************
 // KDTree.h by Bojan Lovrovic (C) 2016 All Rights Reserved.
 // 
-// Structure that helps finding a point from the given set of
+// Structure that helps finding the point from the given set of
 // points that is nearest to the input point.
 //***************************************************************
 
@@ -15,20 +15,20 @@ template<class Type, int k>
 class KDTree : public BinaryTree<std::array<Type, k>>
 {
 public:
-	inline KDTree(std::vector<std::array<Type, k>> &data);
-	inline ~KDTree();
+	KDTree(std::vector<std::array<Type, k>> &data);
+	~KDTree() {}
 
 	// The nearest neighbour search (NN) algorithm aims to find the point in the tree that is nearest to a given input point.
 	// Time complexity is O(log n).
-	inline unsigned int FindNearestNeighbourIndex(const std::array<Type, k> &point) const;
+	unsigned int FindNearestNeighbourIndex(const std::array<Type, k> &point) const;
 
 private:
-	inline Type GetDistanceSq(const std::array<Type, k> &p1, const std::array<Type, k> &p2) const;
-	inline unsigned int GetSplittingAxis(unsigned int nodeIndex) const;
+	Type GetDistanceSq(const std::array<Type, k> &p1, const std::array<Type, k> &p2) const;
+	unsigned int GetSplittingAxis(unsigned int nodeIndex) const;
 	// side: 0 - left, 1 - right
-	inline unsigned int GetChildIndex(unsigned int nodeIndex, unsigned char side) const;
-	inline void CreateNode(std::vector<std::array<Type, k>> &data, unsigned int nodeIndex);
-	inline unsigned int NearestNeighbourIndexSearch(unsigned int nodeIndex, const std::array<Type, k> &point) const;
+	unsigned int GetChildIndex(unsigned int nodeIndex, unsigned char side) const;
+	void CreateNode(std::vector<std::array<Type, k>> &data, unsigned int nodeIndex);
+	unsigned int NearestNeighbourIndexSearch(unsigned int nodeIndex, const std::array<Type, k> &point) const;
 };
 
 // **************************************************************
@@ -36,20 +36,14 @@ private:
 // **************************************************************
 
 template<class Type, int k>
-KDTree<Type, k>::KDTree(std::vector<std::array<Type, k>> &data)
+inline KDTree<Type, k>::KDTree(std::vector<std::array<Type, k>> &data)
 {
 	// Create the root node.
 	CreateNode(data, 1);
 }
 
 template<class Type, int k>
-KDTree<Type, k>::~KDTree()
-{
-
-}
-
-template<class Type, int k>
-unsigned int KDTree<Type, k>::FindNearestNeighbourIndex(const std::array<Type, k> &point) const
+inline unsigned int KDTree<Type, k>::FindNearestNeighbourIndex(const std::array<Type, k> &point) const
 {
 	return NearestNeighbourIndexSearch(GetRoot(), point);
 }
@@ -107,7 +101,7 @@ inline unsigned int KDTree<Type, k>::NearestNeighbourIndexSearch(unsigned int no
 }
 
 template<class Type, int k>
-Type KDTree<Type, k>::GetDistanceSq(const std::array<Type, k> &p1, const std::array<Type, k> &p2) const
+inline Type KDTree<Type, k>::GetDistanceSq(const std::array<Type, k> &p1, const std::array<Type, k> &p2) const
 {
 	Type diff = p1[0] - p2[0];
 	Type distSq = diff * diff;
@@ -120,13 +114,13 @@ Type KDTree<Type, k>::GetDistanceSq(const std::array<Type, k> &p1, const std::ar
 }
 
 template<class Type, int k>
-unsigned int KDTree<Type, k>::GetSplittingAxis(unsigned int nodeIndex) const
+inline unsigned int KDTree<Type, k>::GetSplittingAxis(unsigned int nodeIndex) const
 {
 	return GetDepth(nodeIndex) % k;
 }
 
 template<class Type, int k>
-unsigned int KDTree<Type, k>::GetChildIndex(unsigned int nodeIndex, unsigned char side) const
+inline unsigned int KDTree<Type, k>::GetChildIndex(unsigned int nodeIndex, unsigned char side) const
 {
 	if (side)
 		return GetRightChildIndex(nodeIndex);
@@ -135,7 +129,7 @@ unsigned int KDTree<Type, k>::GetChildIndex(unsigned int nodeIndex, unsigned cha
 }
 
 template<class Type, int k>
-void KDTree<Type, k>::CreateNode(std::vector<std::array<Type, k>> &data, unsigned int nodeIndex)
+inline void KDTree<Type, k>::CreateNode(std::vector<std::array<Type, k>> &data, unsigned int nodeIndex)
 {
 	// Recursion base case
 	if (data.empty())

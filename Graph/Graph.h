@@ -28,32 +28,32 @@ public:
 	Graph(WeightType minValue, WeightType maxValue) : mMinValue(minValue), mMaxValue(maxValue) {}
 	~Graph() {}
 
-	inline void Clear();
-	inline void AddVertex(const VertexType &vert) { mVertices.push_back(vert); }
-	inline void RemoveVertexAt(unsigned int index);
-	inline void AddEdge(unsigned int v1, unsigned int v2, const WeightType &weight);
-	inline void AddEdge(const VertexType &vert1, const VertexType &vert2, WeightType weight);
-	inline void UpdateEdges();
+	void Clear();
+	void AddVertex(const VertexType &vert) { mVertices.push_back(vert); }
+	void RemoveVertexAt(unsigned int index);
+	void AddEdge(unsigned int v1, unsigned int v2, const WeightType &weight);
+	void AddEdge(const VertexType &vert1, const VertexType &vert2, WeightType weight);
+	void UpdateEdges();
 
-	inline std::vector<VertexType> const *GetVertices() const { return &mVertices; }
-	inline VertexType &GetVertexAt(unsigned int index) { return mVertices[index]; }
-	inline unsigned int GetVertexIndex(const VertexType &vert) const;
-	inline unsigned int GetNumberOfVertices() const { return mVertices.size(); }
-	inline Edge<WeightType> &GetEdgeAt(unsigned int index) { return mEdges[index]; }
-	inline Edge<WeightType> &GetEdge(unsigned int v1, unsigned int v2);
-	inline WeightType &GetEdgeWeight(unsigned int v1, unsigned int v2);
-	inline unsigned int GetNumberOfEdges() const { return mEdges.size(); }
+	std::vector<VertexType> const *GetVertices() const { return &mVertices; }
+	VertexType &GetVertexAt(unsigned int index) { return mVertices[index]; }
+	unsigned int GetVertexIndex(const VertexType &vert) const;
+	unsigned int GetNumberOfVertices() const { return mVertices.size(); }
+	Edge<WeightType> &GetEdgeAt(unsigned int index) { return mEdges[index]; }
+	Edge<WeightType> &GetEdge(unsigned int v1, unsigned int v2);
+	WeightType &GetEdgeWeight(unsigned int v1, unsigned int v2);
+	unsigned int GetNumberOfEdges() const { return mEdges.size(); }
 
 	// Dijkstra algorithm will return true if path is found and false if it's not.
 	// outPath		- found path consisting of vertices
 	// d			- total weight of the found path
-	inline bool Dijkstra(const VertexType &source, const VertexType &dest, std::vector<unsigned int> *outPath, WeightType *d) const;
-	inline bool Dijkstra(const unsigned int sI, const unsigned int dI, std::vector<unsigned int> *outPath, WeightType *d) const;
+	bool Dijkstra(const VertexType &source, const VertexType &dest, std::vector<unsigned int> *outPath, WeightType *d) const;
+	bool Dijkstra(const unsigned int sI, const unsigned int dI, std::vector<unsigned int> *outPath, WeightType *d) const;
 
 	// Prim's algorithm, used to generate MST graph. It will return false if all vertices are not connected and true otherwise.
 	// outGraph		- MST graph generated from the input graph
-	inline bool Prim(const VertexType &source, Graph<VertexType, WeightType> *outGraph) const;
-	inline bool Prim(const unsigned int sI, Graph<VertexType, WeightType> *outGraph) const;
+	bool Prim(const VertexType &source, Graph<VertexType, WeightType> *outGraph) const;
+	bool Prim(const unsigned int sI, Graph<VertexType, WeightType> *outGraph) const;
 
 private:
 	// Holds the vertex object index and the some WeightType value associated with it.
@@ -65,10 +65,10 @@ private:
 
 	// STL does not have a decrease key operation so this is my implementation.
 	// The argument 'newValue' needs to be smaller than the current value in heap at 'keyIndex' position.
-	inline void HeapDecreaseKey(std::vector<VertexWeight> &heap, const WeightType &newValue, unsigned int keyIndex) const;
+	void HeapDecreaseKey(std::vector<VertexWeight> &heap, const WeightType &newValue, unsigned int keyIndex) const;
 
 	// y must be smaller than x
-	inline unsigned int GetIndexForCompact(unsigned int x, unsigned int y) const;
+	unsigned int GetIndexForCompact(unsigned int x, unsigned int y) const;
 
 	// Data members
 	std::vector<VertexType> mVertices;
@@ -81,7 +81,7 @@ private:
 //						Definitions
 // **************************************************************
 template<class VertexType, class WeightType>
-void Graph<VertexType, WeightType>::Clear()
+inline void Graph<VertexType, WeightType>::Clear()
 {
 	mVertices.clear();
 	mEdges.clear();
@@ -89,7 +89,7 @@ void Graph<VertexType, WeightType>::Clear()
 }
 
 template<class VertexType, class WeightType>
-void Graph<VertexType, WeightType>::RemoveVertexAt(unsigned int index)
+inline void Graph<VertexType, WeightType>::RemoveVertexAt(unsigned int index)
 {
 	mVertices.erase(mVertices.begin() + index);
 	int eI = 0;
@@ -108,7 +108,7 @@ void Graph<VertexType, WeightType>::RemoveVertexAt(unsigned int index)
 }
 
 template<class VertexType, class WeightType>
-void Graph<VertexType, WeightType>::AddEdge(unsigned int v1, unsigned int v2, const WeightType &weight)
+inline void Graph<VertexType, WeightType>::AddEdge(unsigned int v1, unsigned int v2, const WeightType &weight)
 {
 	// v1 must be smaller than v2.
 	assert(v1 != v2);
@@ -123,7 +123,7 @@ void Graph<VertexType, WeightType>::AddEdge(unsigned int v1, unsigned int v2, co
 }
 
 template<class VertexType, class WeightType>
-void Graph<VertexType, WeightType>::AddEdge(const VertexType &vert1, const VertexType &vert2, WeightType weight)
+inline void Graph<VertexType, WeightType>::AddEdge(const VertexType &vert1, const VertexType &vert2, WeightType weight)
 {
 	unsigned int v1 = GetVertexIndex(vert1);
 	unsigned int v2 = GetVertexIndex(vert2);
@@ -131,7 +131,7 @@ void Graph<VertexType, WeightType>::AddEdge(const VertexType &vert1, const Verte
 }
 
 template<class VertexType, class WeightType>
-void Graph<VertexType, WeightType>::UpdateEdges()
+inline void Graph<VertexType, WeightType>::UpdateEdges()
 {
 	// Recalculate compact edges
 	mEdgesCompact.resize((unsigned int)(mVertices.size() * (mVertices.size() - 1) * 0.5f));
@@ -146,7 +146,7 @@ void Graph<VertexType, WeightType>::UpdateEdges()
 }
 
 template<class VertexType, class WeightType>
-unsigned int Graph<VertexType, WeightType>::GetVertexIndex(const VertexType &vert) const
+inline unsigned int Graph<VertexType, WeightType>::GetVertexIndex(const VertexType &vert) const
 {
 	auto it = find(mVertices.begin(), mVertices.end(), vert);
 	assert(it != mVertices.end());
@@ -154,7 +154,7 @@ unsigned int Graph<VertexType, WeightType>::GetVertexIndex(const VertexType &ver
 }
 
 template<class VertexType, class WeightType>
-Edge<WeightType> &Graph<VertexType, WeightType>::GetEdge(unsigned int v1, unsigned int v2)
+inline Edge<WeightType> &Graph<VertexType, WeightType>::GetEdge(unsigned int v1, unsigned int v2)
 {
 	// v1 must be smaller than v2.
 	assert(v1 != v2);
@@ -189,7 +189,7 @@ inline WeightType &Graph<VertexType, WeightType>::GetEdgeWeight(unsigned int v1,
 }
 
 template<class VertexType, class WeightType>
-bool Graph<VertexType, WeightType>::Dijkstra(const VertexType &source, const VertexType &dest, std::vector<unsigned int> *outPath, WeightType *d) const
+inline bool Graph<VertexType, WeightType>::Dijkstra(const VertexType &source, const VertexType &dest, std::vector<unsigned int> *outPath, WeightType *d) const
 {
 	unsigned int sI = GetVertexIndex(source);
 	unsigned int dI = GetVertexIndex(dest);
@@ -197,7 +197,7 @@ bool Graph<VertexType, WeightType>::Dijkstra(const VertexType &source, const Ver
 }
 
 template<class VertexType, class WeightType>
-bool Graph<VertexType, WeightType>::Dijkstra(const unsigned int sI, const unsigned int dI, std::vector<unsigned int> *outPath, WeightType *d) const
+inline bool Graph<VertexType, WeightType>::Dijkstra(const unsigned int sI, const unsigned int dI, std::vector<unsigned int> *outPath, WeightType *d) const
 {
 	outPath->clear();
 	*d = mMinValue;
@@ -262,14 +262,14 @@ bool Graph<VertexType, WeightType>::Dijkstra(const unsigned int sI, const unsign
 }
 
 template<class VertexType, class WeightType>
-bool Graph<VertexType, WeightType>::Prim(const VertexType &source, Graph<VertexType, WeightType> *outGraph) const
+inline bool Graph<VertexType, WeightType>::Prim(const VertexType &source, Graph<VertexType, WeightType> *outGraph) const
 {
 	unsigned int sI = GetVertexIndex(source);
 	return Primm(sI, outGraph);
 }
 
 template<class VertexType, class WeightType>
-bool Graph<VertexType, WeightType>::Prim(const unsigned int sI, Graph<VertexType, WeightType> *outGraph) const
+inline bool Graph<VertexType, WeightType>::Prim(const unsigned int sI, Graph<VertexType, WeightType> *outGraph) const
 {
 	outGraph->mEdges.clear();
 	std::vector<int> predecessors;
@@ -338,7 +338,7 @@ bool Graph<VertexType, WeightType>::Prim(const unsigned int sI, Graph<VertexType
 }
 
 template<class VertexType, class WeightType>
-void Graph<VertexType, WeightType>::HeapDecreaseKey(std::vector<VertexWeight> &heap, const WeightType &newValue, unsigned int keyIndex) const
+inline void Graph<VertexType, WeightType>::HeapDecreaseKey(std::vector<VertexWeight> &heap, const WeightType &newValue, unsigned int keyIndex) const
 {
 	heap[keyIndex].w = newValue; // 'decrease key' operation
 
@@ -374,7 +374,7 @@ void Graph<VertexType, WeightType>::HeapDecreaseKey(std::vector<VertexWeight> &h
 }
 
 template<class VertexType, class WeightType>
-unsigned int Graph<VertexType, WeightType>::GetIndexForCompact(unsigned int x, unsigned int y) const
+inline unsigned int Graph<VertexType, WeightType>::GetIndexForCompact(unsigned int x, unsigned int y) const
 {
 	return (unsigned int)(x - y - 1 + mVertices.size() * y - y * (y + 1) * 0.5f);
 }
