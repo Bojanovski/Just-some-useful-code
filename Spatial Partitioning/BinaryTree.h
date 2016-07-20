@@ -17,8 +17,8 @@ public:
 	BinaryTree();
 	~BinaryTree() {}
 
-	// Returns the node type object.
-	const BTNodeType &GetNode(unsigned int nodeIndex) const;
+	// Returns the element from the array this structure is using to implement a binary tree.
+	const BTNodeType &GetElement(unsigned int elementIndex) const;
 	// Returns root index of the tree.
 	unsigned int GetRoot() const;
 	// Returns true only if the nodeIndex value represents the node that is not a root node.
@@ -37,12 +37,15 @@ public:
 	unsigned int GetRightChildIndex(unsigned int nodeIndex) const;
 	// Returns true if nodeIndex represents existent node.
 	bool IsNode(unsigned int nodeIndex) const;
+	// Returns the number of elements in the array this structure is using to implement a binary tree.
+	// Note: Some of those elements are not actual nodes of the tree (use 'IsNode').
+	unsigned int GetNumberOfElements() const;
 
 protected:
 	// Increases the depth by one layer.
 	void IncreaseDepth();
 
-	std::vector<std::pair<bool, BTNodeType>> mNodes;
+	std::vector<std::pair<bool, BTNodeType>> mElements;
 };
 
 // **************************************************************
@@ -52,13 +55,13 @@ protected:
 template<class BTNodeType>
 inline BinaryTree<BTNodeType>::BinaryTree()
 {
-	mNodes.resize(1);
+	mElements.resize(1);
 }
 
 template<class BTNodeType>
-inline const BTNodeType &BinaryTree<BTNodeType>::GetNode(unsigned int nodeIndex) const
+inline const BTNodeType &BinaryTree<BTNodeType>::GetElement(unsigned int elementIndex) const
 {
-	return mNodes[nodeIndex].second;
+	return mElements[elementIndex].second;
 }
 
 template<class BTNodeType>
@@ -78,14 +81,14 @@ template<class BTNodeType>
 inline bool BinaryTree<BTNodeType>::GetLeftChildIndex(unsigned int nodeIndex, unsigned int *childIndex) const
 {
 	*childIndex = nodeIndex * 2;
-	return (*childIndex < mNodes.size() && mNodes[*childIndex].first);
+	return (*childIndex < mElements.size() && mElements[*childIndex].first);
 }
 
 template<class BTNodeType>
 inline bool BinaryTree<BTNodeType>::GetRightChildIndex(unsigned int nodeIndex, unsigned int *childIndex) const
 {
 	*childIndex = nodeIndex * 2 + 1;
-	return (*childIndex < mNodes.size() && mNodes[*childIndex].first);
+	return (*childIndex < mElements.size() && mElements[*childIndex].first);
 }
 
 template<class BTNodeType>
@@ -115,14 +118,20 @@ inline unsigned int BinaryTree<BTNodeType>::GetRightChildIndex(unsigned int node
 template<class BTNodeType>
 inline bool BinaryTree<BTNodeType>::IsNode(unsigned int nodeIndex) const
 {
-	return (nodeIndex < mNodes.size() && mNodes[nodeIndex].first);
+	return (nodeIndex < mElements.size() && mElements[nodeIndex].first);
+}
+
+template<class BTNodeType>
+inline unsigned int BinaryTree<BTNodeType>::GetNumberOfElements() const
+{
+	return mElements.size();
 }
 
 template<class BTNodeType>
 inline void BinaryTree<BTNodeType>::IncreaseDepth()
 {
-	unsigned int newSize = 2 * mNodes.size();
-	mNodes.resize(newSize);
+	unsigned int newSize = 2 * mElements.size();
+	mElements.resize(newSize);
 }
 
 #endif

@@ -1,7 +1,7 @@
 //***************************************************************
 // KDTree.h by Bojan Lovrovic (C) 2016 All Rights Reserved.
 // 
-// Structure that helps finding the point from the given set of
+// Structure that enables finding a point from the given set of
 // points that is nearest to the input point.
 //***************************************************************
 
@@ -15,8 +15,11 @@ template<class Type, int k>
 class KDTree : public BinaryTree<std::array<Type, k>>
 {
 public:
-	KDTree(std::vector<std::array<Type, k>> &data);
+	KDTree() {}
+	KDTree(const std::vector<std::array<Type, k>> &data);
 	~KDTree() {}
+
+	void Initialize(const std::vector<std::array<Type, k>> &data);
 
 	// The nearest neighbour search (NN) algorithm aims to find the point in the tree that is nearest to a given input point.
 	// Time complexity is O(log n).
@@ -27,7 +30,7 @@ private:
 	unsigned int GetSplittingAxis(unsigned int nodeIndex) const;
 	// side: 0 - left, 1 - right
 	unsigned int GetChildIndex(unsigned int nodeIndex, unsigned char side) const;
-	void CreateNode(std::vector<std::array<Type, k>> &data, unsigned int nodeIndex);
+	void CreateNode(std::array<Type, k> *data, unsigned int dataElementsNumber, unsigned int nodeIndex);
 	unsigned int NearestNeighbourIndexSearch(unsigned int nodeIndex, const std::array<Type, k> &point) const;
 };
 
@@ -36,10 +39,18 @@ private:
 // **************************************************************
 
 template<class Type, int k>
-inline KDTree<Type, k>::KDTree(std::vector<std::array<Type, k>> &data)
+inline KDTree<Type, k>::KDTree(const std::vector<std::array<Type, k>> &data)
 {
+	Initialize(data);
+}
+
+template<class Type, int k>
+inline void KDTree<Type, k>::Initialize(const std::vector<std::array<Type, k>> &data)
+{
+	// Create a copy of 'data' to work with so that the original stays unchanged.
+	std::vector<std::array<Type, k>> dataCopy = data;
 	// Create the root node.
-	CreateNode(data, 1);
+	CreateNode(&dataCopy[0], dataCopy.size(), 1);
 }
 
 template<class Type, int k>
@@ -59,17 +70,17 @@ inline unsigned int KDTree<Type, k>::NearestNeighbourIndexSearch(unsigned int no
 	unsigned int splittingAxis = GetSplittingAxis(nodeIndex);
 
 	// Find the child to recurse into first.
-	Type splittingValue = GetNode(nodeIndex)[splittingAxis];
+	Type splittingValue = GetElement(nodeIndex)[splittingAxis];
 	unsigned char first = point[splittingAxis] > splittingValue;
 	unsigned int childIndex = GetChildIndex(nodeIndex, first);
 
 	// Recursion
 	unsigned int betterNodeI = nodeIndex;
-	Type betterNodeDistanceSq = GetDistanceSq(point, GetNode(nodeIndex));
+	Type betterNodeDistanceSq = GetDistanceSq(point, GetElement(nodeIndex));
 	if (IsNode(childIndex))
 	{
 		unsigned int childNodeI = NearestNeighbourIndexSearch(childIndex, point);
-		Type childNodeDistanceSq = GetDistanceSq(point, GetNode(childNodeI));
+		Type childNodeDistanceSq = GetDistanceSq(point, GetElement(childNodeI));
 
 		if (childNodeDistanceSq < betterNodeDistanceSq)
 		{
@@ -88,7 +99,7 @@ inline unsigned int KDTree<Type, k>::NearestNeighbourIndexSearch(unsigned int no
 		if (IsNode(otherSideChildIndex))
 		{
 			unsigned int bestOnOtherSideI = NearestNeighbourIndexSearch(otherSideChildIndex, point);
-			Type bestOnOtherSideDistanceSq = GetDistanceSq(point, GetNode(bestOnOtherSideI));
+			Type bestOnOtherSideDistanceSq = GetDistanceSq(point, GetElement(bestOnOtherSideI));
 			if (bestOnOtherSideDistanceSq < betterNodeDistanceSq)
 			{
 				betterNodeI = bestOnOtherSideI;
@@ -129,10 +140,10 @@ inline unsigned int KDTree<Type, k>::GetChildIndex(unsigned int nodeIndex, unsig
 }
 
 template<class Type, int k>
-inline void KDTree<Type, k>::CreateNode(std::vector<std::array<Type, k>> &data, unsigned int nodeIndex)
+inline void KDTree<Type, k>::CreateNode(std::array<Type, k> *data, unsigned int dataElementsNumber, unsigned int nodeIndex)
 {
 	// Recursion base case
-	if (data.empty())
+	if (dataElementsNumber == 0)
 		return;
 
 	// Select axis based on depth so that axis cycles through all valid values
@@ -140,23 +151,25 @@ inline void KDTree<Type, k>::CreateNode(std::vector<std::array<Type, k>> &data, 
 
 	// Sort point list and choose median as a pivot element
 	auto cmp = [axis](const std::array<Type, k> &left, const std::array<Type, k> &right) -> bool { return left[axis] < right[axis]; };
-	std::sort(data.begin(), data.end(), cmp);
-	int medianIndex = data.size() / 2;
+	std::sort(data, data + dataElementsNumber, cmp);
+	int medianIndex = dataElementsNumber / 2;
 	std::array<Type, k> median = data[medianIndex];
 
 	// Create subsets
-	std::vector<std::array<Type, k>>::iterator leftEnd = data.begin() + medianIndex;
-	std::vector<std::array<Type, k>>::iterator rightBegin = leftEnd + 1;
-	std::vector<std::array<Type, k>> leftData(data.begin(), leftEnd);
-	std::vector<std::array<Type, k>> rightData(rightBegin, data.end());
+	std::array<Type, k> *leftBegin = data;
+	std::array<Type, k> *leftEnd = data + medianIndex;
+	std::array<Type, k> *rightBegin = leftEnd + 1;
+	std::array<Type, k> *rightEnd = data + dataElementsNumber;
+	// Note: rightEnd and leftEnd represent the end of the field, meaning there is not
+	// an element of this field on the location this pointer is pointing
 
 	// Create node and construct subtrees
-	if (nodeIndex >= mNodes.size())
+	if (nodeIndex >= mElements.size())
 		IncreaseDepth();
-	mNodes[nodeIndex].first = true;
-	mNodes[nodeIndex].second = median;
-	CreateNode(leftData, GetLeftChildIndex(nodeIndex)); // recursive call
-	CreateNode(rightData, GetRightChildIndex(nodeIndex)); // recursive call
+	mElements[nodeIndex].first = true;
+	mElements[nodeIndex].second = median;
+	CreateNode(leftBegin, leftEnd - leftBegin, GetLeftChildIndex(nodeIndex)); // recursive call
+	CreateNode(rightBegin, rightEnd - rightBegin, GetRightChildIndex(nodeIndex)); // recursive call
 }
 
 #endif
