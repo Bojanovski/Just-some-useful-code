@@ -17,6 +17,7 @@ public:
 	BinaryTree();
 	~BinaryTree() {}
 
+	void Initialize();
 	// Returns the element from the array this structure is using to implement a binary tree.
 	const BTNodeType &GetElement(unsigned int elementIndex) const;
 	// Returns root index of the tree.
@@ -54,6 +55,12 @@ protected:
 
 template<class BTNodeType>
 inline BinaryTree<BTNodeType>::BinaryTree()
+{
+	Initialize();
+}
+
+template<class BTNodeType>
+inline void BinaryTree<BTNodeType>::Initialize()
 {
 	mElements.resize(1);
 }

@@ -71,6 +71,9 @@ inline void KDTreeMap<KeyComponentType, KeyDimension, ValueType>::Initialize(
 	const std::vector<std::array<KeyComponentType, KeyDimension>> &keys,
 	const std::vector<ValueType> &values)
 {
+	assert(keys.size() == values.size());
+	mValues.clear();
+	mKeyToValueMap.clear();
 	KDTree<KeyComponentType, KeyDimension>::Initialize(keys);
 	mValues = values;
 

@@ -47,6 +47,9 @@ inline KDTree<Type, k>::KDTree(const std::vector<std::array<Type, k>> &data)
 template<class Type, int k>
 inline void KDTree<Type, k>::Initialize(const std::vector<std::array<Type, k>> &data)
 {
+	BinaryTree<std::array<Type, k>>::Initialize();
+	if (data.size() == 0)
+		return;
 	// Create a copy of 'data' to work with so that the original stays unchanged.
 	std::vector<std::array<Type, k>> dataCopy = data;
 	// Create the root node.
