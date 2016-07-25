@@ -33,6 +33,7 @@ public:
 	void RemoveVertexAt(unsigned int index);
 	void AddEdge(unsigned int v1, unsigned int v2, const WeightType &weight);
 	void AddEdge(const VertexType &vert1, const VertexType &vert2, WeightType weight);
+	// Calculate internal data. Needs to be called before any use of the Graph object.
 	void UpdateEdges();
 
 	std::vector<VertexType> const *GetVertices() const { return &mVertices; }
@@ -201,6 +202,14 @@ inline bool Graph<VertexType, WeightType>::Dijkstra(const unsigned int sI, const
 {
 	outPath->clear();
 	*d = mMinValue;
+
+	if (sI == dI) // Handle this special case.
+	{
+		outPath->push_back(sI); // just add source vertex
+		// *d is already equal to mMinValue
+		return true;
+	}
+
 	std::vector<int> predecessors;
 	predecessors.resize(mVertices.size());
 	std::vector<VertexWeight> toBeCh;
@@ -234,7 +243,6 @@ inline bool Graph<VertexType, WeightType>::Dijkstra(const unsigned int sI, const
 			do
 			{
 				outPath->push_back(vertI);
-				unsigned int vertPrevI = vertI;
 				vertI = predecessors[vertI];
 			} while (vertI != sI); // until we arrive at the source
 			*d = vW;
